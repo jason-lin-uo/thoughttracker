@@ -1,0 +1,140 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  typecheck-lint:
+    name: Typecheck + Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate --schema backend/prisma/schema.prisma
+      - run: npm run typecheck
+
+  backend-tests:
+    name: Backend integration tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: thoughttracker_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d thoughttracker_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/thoughttracker_test?schema=public
+      AI_PROVIDER: local
+      EMBEDDING_PROVIDER: ml
+      YOUTUBE_PROVIDER: youtube
+      STANCE_ANALYSIS_PROVIDER: custom_ml
+      TOPIC_ASSIGNMENT_PROVIDER: final_policy
+      ENABLE_MOCK_MODE: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - name: Enable pgvector extension
+        run: PGPASSWORD=postgres psql -h localhost -U postgres -d thoughttracker_test -c "CREATE EXTENSION IF NOT EXISTS vector;"
+      - run: npx prisma generate --schema backend/prisma/schema.prisma
+      - run: npx prisma db push --schema backend/prisma/schema.prisma
+      - run: npm run db:seed
+      # --coverage so vitest actually evaluates the 100%-line threshold in CI
+      # (plain `vitest run` never computes coverage, so the gate was inert).
+      - run: npm run test --workspace backend -- --coverage
+
+  e2e:
+    name: Playwright end-to-end tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: thoughttracker_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d thoughttracker_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/thoughttracker_test?schema=public
+      # E2E intercepts expensive AI/embedding calls in the browser; this label
+      # simply prevents the dev server preflight from requiring Ollama in CI.
+      AI_PROVIDER: openai
+      EMBEDDING_PROVIDER: ml
+      YOUTUBE_PROVIDER: youtube
+      STANCE_ANALYSIS_PROVIDER: custom_ml
+      TOPIC_ASSIGNMENT_PROVIDER: final_policy
+      ENABLE_MOCK_MODE: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - name: Enable pgvector extension
+        run: PGPASSWORD=postgres psql -h localhost -U postgres -d thoughttracker_test -c "CREATE EXTENSION IF NOT EXISTS vector;"
+      - run: npx prisma generate --schema backend/prisma/schema.prisma
+      - run: npx prisma db push --schema backend/prisma/schema.prisma
+      - run: npm run db:seed
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+
+  frontend-build:
+    name: Frontend test + typecheck + build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      # Run the frontend unit suite with coverage in CI (previously not run at all).
+      - run: npm run test --workspace frontend -- --coverage
+      - run: npm run typecheck --workspace frontend
+      - run: npm run build --workspace frontend
+
+  secret-scan:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Block known-token patterns
+        run: |
+          set -e
+          # Fail on anything that looks like an API key or token.
+          if grep -RIn -E "(AKCp[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AIza[0-9A-Za-z_-]{30,}|ghp_[A-Za-z0-9]{20,}|xoxb-[A-Za-z0-9-]+)" \
+            --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist --exclude-dir=models . ; then
+            echo "::error::Possible secret detected; refusing to merge."
+            exit 1
+          fi
+          echo "No secret-shaped strings found."

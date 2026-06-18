@@ -1,0 +1,5 @@
+command -v git-lfs >/dev/null 2>&1 || {
+  echo >&2 "git-lfs not found on PATH — LFS objects (e.g. the DB snapshot) won't upload on push. Install git-lfs or run 'git lfs push origin <branch> --all' manually."
+  exit 2
+}
+git lfs pre-push "$@"

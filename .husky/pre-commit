@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+# Run lint + typecheck on staged TS/TSX files via lint-staged.
+# Heavy checks (full test suite, Playwright) run in CI, not here.
+npx lint-staged
