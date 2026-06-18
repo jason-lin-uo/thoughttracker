@@ -15,7 +15,7 @@ beforeEach(() => {
 });
 
 describe("POST /api/reports/reset-starter", () => {
-  it("resets reports to the default report", async () => {
+  it("resets reports to the clean one-report state", async () => {
     vi.mocked(resetReportsToStarter).mockResolvedValue({
       deleted: 3,
       report: {

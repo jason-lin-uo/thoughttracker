@@ -840,7 +840,7 @@ export const openapiSpec = {
         responses: {
           "200": {
             description:
-              "Reports reset; returns { deleted, report } for the featured default report",
+              "Reports reset; returns { deleted, report } for the clean one-report state",
           },
           "403": { description: "Admin PIN required" },
           "404": { description: "Starter creator/topic missing" },

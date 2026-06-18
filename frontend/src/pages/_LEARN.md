@@ -83,8 +83,7 @@ links each row to its job detail page.
 
 After the admin PIN unlocks the page, it also reveals the owner-only
 **Reset all reports** control. That clears generated reports and restores the
-single default MKBHD foldable-phone report, matching the fresh local and hosted
-snapshot state.
+clean one-report state, matching the fresh local and hosted snapshot state.
 
 **Endpoints used:** `POST /api/creator-onboarding/run` (batch), with a
 per-channel import-job fallback, and `POST /api/reports/reset-starter`.

@@ -231,9 +231,9 @@ export async function bulkDeleteReports(
 
 /**
  * POST /api/reports/reset-starter clears all generated reports and restores
- * the featured default topic report used by fresh demos: Marques Brownlee on
- * foldable smartphone reviews. Admin-gated and deterministic, so it does not
- * call an LLM or spend API tokens.
+ * the clean one-report snapshot used by fresh local and hosted installs.
+ * Admin-gated and deterministic, so it does not call an LLM or spend API
+ * tokens.
  */
 export async function resetReportsToStarterController(
   _req: Request,

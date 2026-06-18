@@ -110,10 +110,10 @@ function SpotlightGlyph({ className = "" }: { className?: string }) {
  * FeaturedShift - the dashboard's single hero highlight.
  *
  * Surfaces the server-selected insight. The backend prefers the latest topic
- * report when it maps to analyzed timeline data, which lets the featured
- * default report headline a fresh demo. Otherwise it falls back to the strongest analyzed
- * timeline. The card deep-links to the report when one exists, falling back to
- * the topic-analysis page otherwise.
+ * report when it maps to analyzed timeline data, which keeps a fresh public
+ * snapshot from opening on an empty report surface. Otherwise it falls back to
+ * the strongest analyzed timeline. The card deep-links to the report when one
+ * exists, falling back to the topic-analysis page otherwise.
  *
  * @param props.insight - The server-computed featured insight.
  */

@@ -13,9 +13,9 @@ import {
  * Aggregated overview powering the top-level Dashboard page:
  * - totals (creators / videos / transcripts / topics / evidence)
  * - featuredInsight: the hero card. Prefer the latest generated topic report
- * so the featured default report can headline the demo; fall back to the strongest
- * analyzed timeline when no report-backed topic is available. null only when
- * nothing has been analyzed yet. See services/dashboardInsight.ts.
+ * so a clean public snapshot has a report-backed hero; fall back to the
+ * strongest analyzed timeline when no report-backed topic is available. null
+ * only when nothing has been analyzed yet. See services/dashboardInsight.ts.
  * - the 5 most-recent import jobs (with creator denormalised)
  * - the 6 most-recent creators (with video counts)
  * - the 5 most-recent reports (with creator + topic denormalised)

@@ -50,9 +50,9 @@ trajectory visualization, and source evidence.
   videos, and stance trajectory.
 - Open the Topic Analysis page for Foldable Smartphone Reviews to see per-video
   stance, date filtering, trajectory visualization, and transcript evidence.
-- Review [`ARCHITECTURE.md`](ARCHITECTURE.md), [`docs/DEPLOY.md`](docs/DEPLOY.md),
-  and [`docs/UPLOAD_PLAN.md`](docs/UPLOAD_PLAN.md) for implementation,
-  deployment, and staged-upload reasoning.
+- Review [`ARCHITECTURE.md`](ARCHITECTURE.md) and
+  [`docs/DEPLOY.md`](docs/DEPLOY.md) for implementation and deployment
+  reasoning.
 
 ## Product Principles
 

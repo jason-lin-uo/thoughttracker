@@ -65,7 +65,7 @@ thoughttracker/
   e2e/
     Playwright specs
   docs/
-    deploy guide, ADRs, upload plan, design notes
+    deploy guide, ADRs, design notes
   thoughttracker_full.dump
     Git-LFS-tracked PostgreSQL snapshot
 
@@ -491,7 +491,6 @@ Maintain:
 - `ARCHITECTURE.md`: system map and runtime decisions
 - `GLOSSARY.md`: reader-friendly technical definitions
 - `docs/DEPLOY.md`: local/hosted deployment and environment variables
-- `docs/UPLOAD_PLAN.md`: public GitHub publishing plan with atomic PRs
 - `REVERSE_ENGINEERED_PROMPT.md`: this full rebuild brief
 - ADRs: historical decisions and why they changed
 - `_LEARN.md` files: folder-level orientation notes

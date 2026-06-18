@@ -9,7 +9,6 @@ This folder contains human-facing project documentation.
 | `DEPLOY.md`            | Current deployment and environment runbook.                                  |
 | `DESIGN_REFERENCES.md` | UI inspiration and product-design references.                                |
 | `adr/`                 | Historical architecture decision records.                                    |
-| `UPLOAD_PLAN.md`       | Historical upload/publishing plan kept intentionally for later final review. |
 
 ## Current Source Of Truth
 
@@ -24,8 +23,3 @@ For the active product state, use:
 
 The ADRs are useful history. Some older ADR wording may describe decisions that
 were later superseded by the real-data, ML-backed, local-LLM product path.
-
-## Important Rule
-
-Do not update `docs/UPLOAD_PLAN.md` until the final public-GitHub publishing
-plan is ready. It was deliberately preserved for that later step.

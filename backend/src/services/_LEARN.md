@@ -24,7 +24,7 @@ specializes:
   creators
 - **The YouTube-import chef** brings in new transcripts from outside
 - **The report chef** writes the long-form analyses
-- **The featured-report chef** restores the default one-report demo state
+- **The featured-report chef** restores the clean one-report state
 - **The evidence chef** fetches and contextualizes individual evidence
   rows
 - **The embedding chef** turns chunks into vectors for owner/offline
@@ -353,9 +353,9 @@ requiring `MIN_VIDEOS_FOR_FEATURE` videos) and picks the fallback hero;
 payload, preferring a backing topic report title/summary/id when present.
 
 **Why it exists:** the dashboard controller now prefers the latest topic
-report when it maps to analyzed data, which lets the featured default report
-headline a fresh/reset demo. These helpers keep the fallback hero honest
-when no report-backed topic is available.
+report when it maps to analyzed data, which keeps a fresh/reset public snapshot
+from opening on an empty report surface. These helpers keep the fallback hero
+honest when no report-backed topic is available.
 
 **Used by:** `controllers/dashboard.controller.ts:getDashboard`.
 

@@ -12,7 +12,7 @@ function video(title: string, publishedAt: Date | null = new Date("2026-01-01"))
   return { id: title.toLowerCase().replace(/\W+/g, "-"), title, publishedAt };
 }
 
-describe("default report builder", () => {
+describe("seeded report builder", () => {
   it("builds a deterministic report from real timeline, summary, and quote rows", () => {
     const report = buildStarterReport({
       creator,
@@ -220,7 +220,7 @@ describe("resetReportsToStarter", () => {
     };
   }
 
-  it("deletes all reports and creates the default report in one transaction", async () => {
+  it("deletes all reports and creates the seeded report in one transaction", async () => {
     const { db, tx } = buildDb();
     const result = await resetReportsToStarter(db as never);
 
