@@ -1,0 +1,459 @@
+// ThoughtTracker — Prisma schema
+// Evidence chain: Creator → SourceChannel → Video → Transcript → TranscriptChunk
+//                  → ChunkTopicAnalysis → VideoTopicSummary → CreatorTopicTimeline → Report
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum CreatorType {
+  podcast
+  youtube_channel
+  individual
+  organization
+  other
+}
+
+enum Platform {
+  youtube
+}
+
+enum TranscriptStatus {
+  pending
+  available
+  unavailable
+  failed
+  manual
+}
+
+enum TranscriptSourceType {
+  youtube_auto
+  youtube_manual
+  manual_paste
+  manual_upload
+}
+
+enum AnalysisStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
+enum ImportJobStatus {
+  pending
+  processing
+  completed
+  completed_with_errors
+  failed
+}
+
+enum ImportJobItemStatus {
+  pending
+  metadata_imported
+  transcript_imported
+  analysis_completed
+  transcript_unavailable
+  failed
+}
+
+enum TopicSource {
+  system_default
+  ai_detected
+  user_created
+}
+
+enum StanceLabel {
+  supportive
+  opposed
+  neutral
+  mixed
+  unclear
+  insufficient_evidence
+}
+
+enum ConfidenceLabel {
+  low
+  medium
+  high
+}
+
+enum TrendLabel {
+  stable
+  gradual_shift
+  abrupt_shift
+  mixed
+  insufficient_data
+}
+
+enum ReportType {
+  creator_summary
+  topic_summary
+}
+
+enum AnalysisType {
+  topic_detection
+  stance_classification
+  video_summary
+  creator_timeline
+  creator_report
+  topic_report
+  embedding_generation
+}
+
+// ---------------------------------------------------------------------------
+// Models
+// ---------------------------------------------------------------------------
+
+model Creator {
+  id           String      @id @default(cuid())
+  name         String
+  slug         String      @unique
+  description  String?
+  creatorType  CreatorType @default(youtube_channel)
+  thumbnailUrl String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  sourceChannels SourceChannel[]
+  videos         Video[]
+  chunkAnalyses  ChunkTopicAnalysis[]
+  videoSummaries VideoTopicSummary[]
+  timelines      CreatorTopicTimeline[]
+  reports        Report[]
+  importJobs     ImportJob[]
+
+  // `slug` is already @unique, which creates a unique index; a separate
+  // @@index([slug]) would be redundant. Index createdAt instead, since the
+  // creator list/overview sort newest-first.
+  @@index([createdAt])
+}
+
+model SourceChannel {
+  id             String   @id @default(cuid())
+  creatorId      String
+  platform       Platform @default(youtube)
+  channelUrl     String
+  channelId      String?
+  handle         String?
+  title          String?
+  description    String?
+  thumbnailUrl   String?
+  lastImportedAt DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  creator    Creator     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  videos     Video[]
+  importJobs ImportJob[]
+
+  // Compound unique on (platform, channelId). Note Postgres treats NULLs as
+  // distinct, so this already behaves as a PARTIAL unique index over non-null
+  // channelIds (multiple `channelId = NULL` rows are permitted) — which is the
+  // intended semantics: real imports always resolve a concrete channelId, and
+  // we never want two channels sharing one. This compound key is also the
+  // upsert target used by importChannel.job.
+  @@unique([platform, channelId])
+  @@index([creatorId])
+}
+
+model Video {
+  id              String           @id @default(cuid())
+  creatorId       String
+  sourceChannelId String?
+  platform        Platform         @default(youtube)
+  sourceVideoId   String
+  sourceUrl       String
+  title           String
+  description     String?
+  publishedAt     DateTime?
+  durationSeconds Int?
+  thumbnailUrl    String?
+  transcriptStatus TranscriptStatus @default(pending)
+  analysisStatus   AnalysisStatus   @default(pending)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  creator         Creator              @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  // Explicit onDelete: SetNull (vs the implicit Restrict) so deleting a
+  // SourceChannel doesn't fail on, or cascade into, its videos.
+  sourceChannel   SourceChannel?       @relation(fields: [sourceChannelId], references: [id], onDelete: SetNull)
+  transcript      Transcript?
+  chunks          TranscriptChunk[]
+  chunkAnalyses   ChunkTopicAnalysis[]
+  videoSummaries  VideoTopicSummary[]
+  importJobItems  ImportJobItem[]
+
+  @@unique([platform, sourceVideoId])
+  @@index([creatorId])
+  @@index([publishedAt])
+  // Composite indexes matching the real videos.controller filter patterns
+  // (creator + status filters) and the newest-first creator listing.
+  @@index([creatorId, transcriptStatus])
+  @@index([creatorId, analysisStatus])
+  @@index([creatorId, publishedAt])
+}
+
+model Transcript {
+  id           String               @id @default(cuid())
+  videoId      String               @unique
+  sourceType   TranscriptSourceType @default(youtube_auto)
+  language     String               @default("en")
+  rawText      String               @db.Text
+  cleanedText  String?              @db.Text
+  segments     Json?
+  wordCount    Int                  @default(0)
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+
+  video  Video             @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  chunks TranscriptChunk[]
+}
+
+model TranscriptChunk {
+  id            String   @id @default(cuid())
+  transcriptId  String
+  videoId       String
+  chunkIndex    Int
+  text          String   @db.Text
+  startSeconds  Float?
+  endSeconds    Float?
+  speaker       String?
+  tokenCount    Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  transcript Transcript           @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
+  video      Video                @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  analyses   ChunkTopicAnalysis[]
+  embedding  Embedding?
+
+  @@unique([transcriptId, chunkIndex])
+  @@index([videoId, chunkIndex])
+}
+
+model Topic {
+  id          String      @id @default(cuid())
+  name        String
+  slug        String      @unique
+  description String?
+  source      TopicSource @default(ai_detected)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  chunkAnalyses  ChunkTopicAnalysis[]
+  videoSummaries VideoTopicSummary[]
+  timelines      CreatorTopicTimeline[]
+  reports        Report[]
+
+  // `slug` is already @unique (unique index); a separate @@index([slug])
+  // would be redundant, so it's dropped.
+}
+
+model ChunkTopicAnalysis {
+  id              String           @id @default(cuid())
+  chunkId         String
+  videoId         String
+  creatorId       String
+  topicId         String
+  analysisRunId   String?
+  relevanceScore  Float            @default(0)
+  stanceLabel     StanceLabel      @default(insufficient_evidence)
+  confidenceScore Float            @default(0)
+  confidenceLabel ConfidenceLabel  @default(low)
+  claimSummary    String?          @db.Text
+  rationale       String?          @db.Text
+  evidenceQuote   String?          @db.Text
+  createdAt       DateTime         @default(now())
+
+  chunk       TranscriptChunk @relation(fields: [chunkId], references: [id], onDelete: Cascade)
+  video       Video           @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  creator     Creator         @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  topic       Topic           @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  analysisRun AnalysisRun?    @relation(fields: [analysisRunId], references: [id], onDelete: SetNull)
+
+  // One analysis per (chunk, topic). The analyzeVideo job clears a video's
+  // prior analyses before re-running, then upserts on this key, so re-runs /
+  // partial failures replace rather than duplicate rows.
+  @@unique([chunkId, topicId])
+  @@index([creatorId, topicId])
+  @@index([videoId, topicId])
+  @@index([topicId, stanceLabel])
+  // Evidence Explorer filters by (creator, topic) with a relevance floor and
+  // ranks by confidence — this composite covers that hot path.
+  @@index([creatorId, topicId, relevanceScore, confidenceScore])
+}
+
+model VideoTopicSummary {
+  id                  String           @id @default(cuid())
+  videoId             String
+  creatorId           String
+  topicId             String
+  analysisRunId       String?
+  dominantStance      StanceLabel      @default(insufficient_evidence)
+  confidenceScore     Float            @default(0)
+  confidenceLabel     ConfidenceLabel  @default(low)
+  mentionCount        Int              @default(0)
+  summary             String?          @db.Text
+  notableEvidence     Json?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  video       Video        @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  creator     Creator      @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  topic       Topic        @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  analysisRun AnalysisRun? @relation(fields: [analysisRunId], references: [id], onDelete: SetNull)
+
+  @@unique([videoId, topicId])
+  @@index([creatorId, topicId])
+}
+
+model CreatorTopicTimeline {
+  id            String       @id @default(cuid())
+  creatorId     String
+  topicId       String
+  analysisRunId String?
+  dateStart     DateTime?
+  dateEnd       DateTime?
+  trendLabel    TrendLabel   @default(insufficient_data)
+  summary       String?      @db.Text
+  evidence      Json?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  creator     Creator      @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  topic       Topic        @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  analysisRun AnalysisRun? @relation(fields: [analysisRunId], references: [id], onDelete: SetNull)
+
+  @@unique([creatorId, topicId])
+}
+
+model Report {
+  id            String     @id @default(cuid())
+  creatorId     String
+  topicId       String?
+  reportType    ReportType
+  title         String
+  summary       String     @db.Text
+  caveats       String     @db.Text
+  // Generated report body as JSON: { sections: [{ heading, body }], evidence:
+  // [{ videoTitle?, topic?, note?, videoId?, topicId? }] }. Written by
+  // generateReport.job; getReport re-hydrates citations into deep-link ids.
+  evidence      Json?
+  analysisRunId String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  creator     Creator      @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  // Explicit onDelete: SetNull so deleting a topic doesn't fail on its
+  // historical reports (and keeps a creator_summary report, whose topic is
+  // already null, consistent).
+  topic       Topic?       @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  analysisRun AnalysisRun? @relation(fields: [analysisRunId], references: [id], onDelete: SetNull)
+
+  @@index([creatorId])
+  @@index([topicId])
+  // Report list/overview filter by creator+topic+type and sort newest-first.
+  @@index([creatorId, topicId, reportType, createdAt])
+}
+
+model ImportJob {
+  id                       String          @id @default(cuid())
+  creatorId                String?
+  sourceChannelId          String?
+  channelUrl               String
+  requestedLimit           Int             @default(10)
+  status                   ImportJobStatus @default(pending)
+  totalVideosFound         Int             @default(0)
+  totalVideosImported      Int             @default(0)
+  totalTranscriptsImported Int             @default(0)
+  totalFailed              Int             @default(0)
+  errorMessage             String?         @db.Text
+  startedAt                DateTime?
+  completedAt              DateTime?
+  createdAt                DateTime        @default(now())
+  updatedAt                DateTime        @updatedAt
+
+  // Explicit onDelete: SetNull (vs implicit Restrict) so deleting a creator or
+  // source channel doesn't fail on, or orphan-block, its historical jobs.
+  creator       Creator?        @relation(fields: [creatorId], references: [id], onDelete: SetNull)
+  sourceChannel SourceChannel?  @relation(fields: [sourceChannelId], references: [id], onDelete: SetNull)
+  items         ImportJobItem[]
+
+  @@index([createdAt])
+}
+
+model ImportJobItem {
+  id               String              @id @default(cuid())
+  importJobId      String
+  videoId          String?
+  sourceVideoId    String
+  sourceUrl        String
+  title            String?
+  publishedAt      DateTime?
+  status           ImportJobItemStatus @default(pending)
+  transcriptStatus TranscriptStatus    @default(pending)
+  analysisStatus   AnalysisStatus      @default(pending)
+  errorMessage     String?             @db.Text
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  importJob ImportJob @relation(fields: [importJobId], references: [id], onDelete: Cascade)
+  video     Video?    @relation(fields: [videoId], references: [id])
+
+  @@index([importJobId])
+}
+
+model AnalysisRun {
+  id            String         @id @default(cuid())
+  analysisType  AnalysisType
+  status        AnalysisStatus @default(pending)
+  provider      String?
+  modelName     String?
+  promptVersion String?
+  inputHash     String?
+  errorMessage  String?        @db.Text
+  startedAt     DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime       @default(now())
+
+  chunkAnalyses  ChunkTopicAnalysis[]
+  videoSummaries VideoTopicSummary[]
+  timelines      CreatorTopicTimeline[]
+  reports        Report[]
+
+  @@index([analysisType, createdAt])
+}
+
+model Embedding {
+  id             String                       @id @default(cuid())
+  chunkId        String                       @unique
+  embeddingModel String
+  /// The vector as a JSON array — the pgvector-independent fallback store (the
+  /// JS-cosine path reads it when the `vector` extension is unavailable). NULL
+  /// when the native `vector` column below is populated (pgvector present), so
+  /// the vector isn't stored twice. See generateEmbeddingsForChunks.
+  vectorJson     Json?
+  /// Optional native pgvector column. Populated when the `vector` extension
+  /// is available for owner/offline vector maintenance workflows.
+  /// Falls back to the JSON-stored `vectorJson` when null.
+  ///
+  /// DIMENSION COUPLING: fixed at `vector(768)`, matching EMBEDDING_DIM in
+  /// embeddingClient.ts — the `ml` provider (mean-pooled DistilBERT) and the
+  /// local ML embeddings emit 768-d vectors. Switching to a provider
+  /// with a different dimension (e.g. OpenAI 1536-d) requires changing this to
+  /// `vector(1536)` and re-running `db push` + re-embedding; otherwise native
+  /// inserts dimension-mismatch and the dual-write degrades to the JSON column.
+  vector         Unsupported("vector(768)")?
+  createdAt      DateTime                     @default(now())
+
+  chunk TranscriptChunk @relation(fields: [chunkId], references: [id], onDelete: Cascade)
+}
