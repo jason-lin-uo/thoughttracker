@@ -1,0 +1,19 @@
+# Keep Render/Docker builds small and secret-free.
+*
+
+# Root workspace manifests used by npm ci.
+!package.json
+!package-lock.json
+!.npmrc
+
+# Backend runtime/build inputs.
+!backend/
+!backend/package.json
+!backend/tsconfig.json
+!backend/src/**
+!backend/prisma/**
+
+# The npm workspace install only needs the frontend manifest.
+!frontend/
+frontend/**
+!frontend/package.json

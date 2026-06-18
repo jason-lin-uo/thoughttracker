@@ -1,0 +1,73 @@
+# Render.com Blueprint for the ThoughtTracker portfolio app.
+#
+# What it provisions:
+#   1. A Docker-backed web service (`thoughttracker-api`) for the Express API.
+#   2. A static site (`thoughttracker-web`) for the Vite bundle.
+#
+# Database:
+#   Use Neon Free (or another pgvector-capable hosted Postgres) and restore
+#   `thoughttracker_hosted_free.dump` before deploying. DATABASE_URL is a secret
+#   supplied in Render, not a managed database created by this blueprint.
+#
+# The restored hosted dump already contains the schema. The API container only
+# verifies pgvector/index setup on boot:
+#   node dist/prisma/setup-db.js
+#
+# Defaults:
+#   - Public hosting uses the pre-generated real reports in the database.
+#   - No OpenAI key or hosted ML service is required for the read-only portfolio
+#     app path.
+#   - LOG_LEVEL=info keeps request lifecycle events visible in Render logs.
+
+services:
+  # ----- Backend API ---------------------------------------------------------
+  - type: web
+    name: thoughttracker-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "4000"
+      - key: LOG_LEVEL
+        value: info
+      - key: PUBLIC_READ_CACHE_TTL_MS
+        value: "300000"
+      - key: ENABLE_MOCK_MODE
+        value: "false"
+      - key: DEMO_MODE
+        value: "true"
+      - key: AI_PROVIDER
+        value: local
+      - key: STANCE_ANALYSIS_PROVIDER
+        value: custom_ml
+      - key: TOPIC_ASSIGNMENT_PROVIDER
+        value: final_policy
+      - key: ADMIN_ONBOARDING_PIN
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: FRONTEND_URL
+        value: https://thoughttracker-web.onrender.com
+
+  # ----- Frontend static site ------------------------------------------------
+  # Render serves the prebuilt `frontend/dist` directory directly. The frontend
+  # calls the API by absolute URL; the rewrite only keeps SPA routes working.
+  - type: web
+    name: thoughttracker-web
+    runtime: static
+    buildCommand: npm ci && npm run build --workspace frontend
+    staticPublishPath: ./frontend/dist
+    autoDeploy: true
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://thoughttracker-api.onrender.com/api
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

@@ -1,0 +1,47 @@
+# Production nginx config for the ThoughtTracker SPA + API reverse-proxy.
+# Loaded from /etc/nginx/templates/default.conf.template — nginx:alpine runs
+# envsubst on it at boot so ${API_PROXY_TARGET} is interpolated.
+
+server {
+    listen 8080;
+    server_name _;
+
+    # Static SPA bundle.
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Cache-bust strategy: hashed asset filenames get long cache; index.html
+    # is always revalidated so users pick up new bundles immediately.
+    location ~* \.(js|css|woff2?|ttf|svg|png|jpg|jpeg|gif|webp|ico)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        try_files $uri =404;
+    }
+
+    location = /index.html {
+        add_header Cache-Control "no-store, max-age=0";
+    }
+
+    # API reverse-proxy: same-origin in production avoids CORS plumbing.
+    location /api/ {
+        proxy_pass ${API_PROXY_TARGET};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 60s;
+    }
+
+    # SPA fallback — every non-asset/non-API path serves index.html so React
+    # Router can take over.
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Health endpoint for Render / Fly probes.
+    location = /healthz {
+        access_log off;
+        add_header Content-Type text/plain;
+        return 200 "ok";
+    }
+}
