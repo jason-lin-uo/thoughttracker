@@ -25,6 +25,23 @@ needs an OpenAI key to see rich reports. The companion `thoughttracker-ml` repo
 remains the offline pipeline for adding creators, recalibrating labels, and
 refreshing the product snapshot.
 
+## Project Preview
+
+The hosted app is the best way to explore the product, but these screenshots
+show the core experience directly from the repository.
+
+![ThoughtTracker dashboard showing the featured Marques Brownlee foldables report, corpus totals, and five real creators.](docs/assets/screenshots/dashboard.png)
+
+**Report view:** AI-assisted analysis is grounded in transcript evidence and a
+clickable stance trajectory.
+
+![ThoughtTracker report detail page with the MKBHD foldables stance trajectory and written summary.](docs/assets/screenshots/report-detail.png)
+
+**Topic analysis:** every topic has creator-specific stance, date filtering,
+trajectory visualization, and source evidence.
+
+![ThoughtTracker topic analysis page for Marques Brownlee on foldable smartphone reviews.](docs/assets/screenshots/topic-analysis.png)
+
 ## Product Principles
 
 - Evidence first: every topic or stance claim links back to a transcript chunk.
