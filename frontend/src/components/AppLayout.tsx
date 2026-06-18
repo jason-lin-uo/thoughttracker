@@ -152,7 +152,7 @@ function Sidebar({ onPrefetch }: { onPrefetch: (to: string) => void }) {
           <NavItem key={item.to} {...item} onPrefetch={onPrefetch} />
         ))}
       </nav>
-      <p className="mt-auto pt-6 text-xs text-ink-500">
+      <p className="mt-auto pt-6 text-xs text-ink-300">
         {strings.brand.authorByline}
       </p>
     </aside>
@@ -320,7 +320,7 @@ function MobileDrawer({
             />
           ))}
         </nav>
-        <p className="mt-8 text-xs text-ink-500">
+        <p className="mt-8 text-xs text-ink-300">
           {strings.brand.authorByline}
         </p>
       </aside>

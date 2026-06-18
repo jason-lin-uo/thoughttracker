@@ -361,9 +361,9 @@ export function ChartState({
       <div
         role="status"
         aria-live="polite"
-        className="card card-pad h-64 flex items-center justify-center text-sm text-ink-500 dark:text-ink-400"
+        className="card card-pad h-64 flex items-center justify-center text-sm text-ink-700 dark:text-ink-300"
       >
-        <span className="animate-pulse">{strings.charts.loading}</span>
+        <span>{strings.charts.loading}</span>
       </div>
     );
   }

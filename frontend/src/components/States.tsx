@@ -127,9 +127,9 @@ export function LoadingState({
     <div
       role="status"
       aria-live="polite"
-      className="card card-pad flex items-center justify-center text-ink-500 dark:text-ink-400 text-sm py-10"
+      className="card card-pad flex items-center justify-center text-ink-700 dark:text-ink-300 text-sm py-10"
     >
-      <span className="animate-pulse">{label}</span>
+      <span>{label}</span>
     </div>
   );
 }
