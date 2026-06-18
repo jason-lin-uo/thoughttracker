@@ -1,0 +1,30 @@
+# Local-dev Postgres for ThoughtTracker.
+# Usage:
+# docker compose up -d # start postgres
+# docker compose down # stop postgres
+# docker compose down -v # stop and wipe the volume
+#
+# After it's up, `DATABASE_URL=postgresql://postgres:postgres@localhost:5432/thoughttracker?schema=public`
+# in backend/.env will Just Work.
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: thoughttracker-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: thoughttracker
+    ports:
+      - "5432:5432"
+    volumes:
+      - thoughttracker_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d thoughttracker"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  thoughttracker_pgdata:
