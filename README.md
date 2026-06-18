@@ -42,6 +42,18 @@ trajectory visualization, and source evidence.
 
 ![ThoughtTracker topic analysis page for Marques Brownlee on foldable smartphone reviews.](docs/assets/screenshots/topic-analysis.png)
 
+## What To Review First
+
+- Open the live app and start on the dashboard; it shows the real five-creator
+  corpus and the default Marques Brownlee foldables report.
+- Open the featured report to inspect the evidence-backed AI analysis,
+  clickable source videos, and stance trajectory.
+- Open the Topic Analysis page for Foldable Smartphone Reviews to see per-video
+  stance, date filtering, trajectory visualization, and transcript evidence.
+- Review [`ARCHITECTURE.md`](ARCHITECTURE.md), [`docs/DEPLOY.md`](docs/DEPLOY.md),
+  and [`docs/UPLOAD_PLAN.md`](docs/UPLOAD_PLAN.md) for implementation,
+  deployment, and staged-upload reasoning.
+
 ## Product Principles
 
 - Evidence first: every topic or stance claim links back to a transcript chunk.
