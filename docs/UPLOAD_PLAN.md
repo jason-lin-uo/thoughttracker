@@ -1,5 +1,7 @@
 # Upload Plan - Atomic PR Roadmap For Publishing ThoughtTracker
 
+Author: Jason Lin
+
 This repository is the working sandbox. The public GitHub repositories should
 not receive one enormous "here is everything" commit. This document explains how
 to publish the finished project into your real public repos as a readable

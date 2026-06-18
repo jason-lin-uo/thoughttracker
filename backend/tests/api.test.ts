@@ -30,6 +30,18 @@ afterAll(async () => {
 });
 
 describe("health + system status", () => {
+  it("GET / returns a friendly API landing payload", async () => {
+    const res = await request(app).get("/");
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({
+      name: "ThoughtTracker API",
+      author: "Jason Lin",
+      status: "ok",
+      health: "/api/health",
+    });
+    expect(res.body.app).toMatch(/^https?:\/\//);
+  });
+
   it("GET /api/health → 200", async () => {
     const res = await request(app).get("/api/health");
     expect(res.status).toBe(200);

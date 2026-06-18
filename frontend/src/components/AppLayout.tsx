@@ -133,10 +133,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
  * Sidebar — the persistent navigation column shown on `lg+` viewports
  * (≥1024 px). Renders the full brand lockup (the "T" mark + "ThoughtTracker"
  * wordmark + tagline) in the top-left corner — the conventional product-identity
- * anchor, so the corner doesn't read as empty — and the primary nav list. No
- * footer: the old footer block was a third, vestigial copy of the brand that
- * went unnoticed, so it's gone (the header banner + this lockup are the two
- * intentional placements).
+ * anchor, so the corner doesn't read as empty — and the primary nav list.
+ * Footer: a restrained authorship line for portfolio context without adding
+ * another product wordmark.
  *
  * Visibility is controlled by Tailwind's `hidden lg:flex` pair so the
  * sidebar never appears on small screens — the mobile drawer takes over
@@ -153,6 +152,9 @@ function Sidebar({ onPrefetch }: { onPrefetch: (to: string) => void }) {
           <NavItem key={item.to} {...item} onPrefetch={onPrefetch} />
         ))}
       </nav>
+      <p className="mt-auto pt-6 text-xs text-ink-500">
+        {strings.brand.authorByline}
+      </p>
     </aside>
   );
 }
@@ -318,6 +320,9 @@ function MobileDrawer({
             />
           ))}
         </nav>
+        <p className="mt-8 text-xs text-ink-500">
+          {strings.brand.authorByline}
+        </p>
       </aside>
     </div>
   );

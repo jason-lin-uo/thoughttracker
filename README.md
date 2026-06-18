@@ -1,5 +1,7 @@
 # ThoughtTracker
 
+Built by Jason Lin as a full-stack ML-backed portfolio project.
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://react.dev/)
@@ -8,6 +10,8 @@
 [![Local AI](https://img.shields.io/badge/Reports-Ollama%20local-111827)](#local-setup)
 
 **Evidence-backed transcript analysis for YouTube creators.**
+
+Live app: <https://thoughttracker-web-415a.onrender.com/>
 
 ThoughtTracker is a full-stack TypeScript application that analyzes real
 YouTube transcript corpora. It stores creator videos, transcript chunks, topic
@@ -289,7 +293,7 @@ The hosted free path has two performance layers:
 Refresh the bundled snapshot after changing the hosted starter data:
 
 ```powershell
-$env:BOOTSTRAP_API_BASE_URL="https://thoughttracker-api.onrender.com/api"
+$env:BOOTSTRAP_API_BASE_URL="https://thoughttracker-api-3mm9.onrender.com/api"
 npm run snapshot:bootstrap
 ```
 

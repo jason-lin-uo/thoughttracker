@@ -2,6 +2,7 @@
   "name": "@thoughttracker/backend",
   "version": "1.0.0",
   "private": true,
+  "author": "Jason Lin",
   "main": "dist/src/server.js",
   "scripts": {
     "dev": "node ../scripts/setup-local-ai.mjs && tsx watch src/server.ts",

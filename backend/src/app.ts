@@ -65,6 +65,21 @@ export function buildApp() {
   app.use(requestTimeout(num(process.env.REQUEST_TIMEOUT_MS, 15_000)));
 
   /*
+   * Friendly root for anyone who clicks the API service URL directly.
+   * The actual product lives in the frontend; API endpoints stay under /api.
+   */
+  app.get("/", (_req, res) =>
+    res.json({
+      name: "ThoughtTracker API",
+      author: "Jason Lin",
+      status: "ok",
+      app: env.frontendUrl,
+      health: "/api/health",
+      docs: "/api/docs",
+    }),
+  );
+
+  /*
    * OpenAPI spec + Swagger UI (before the rest of /api so /api/docs resolves
    * first). Gated behind `requireAdmin`: in production/demo the spec + Swagger
    * UI enumerate the full mutating surface (and our X-Admin-Pin scheme), so we

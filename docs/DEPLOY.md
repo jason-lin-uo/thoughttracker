@@ -1,5 +1,7 @@
 # Deployment
 
+Author: Jason Lin
+
 ThoughtTracker can run locally or on a hosted stack as long as the deployment
 has a pgvector-capable PostgreSQL database and the real database snapshot. The
 public portfolio path uses pre-generated real reports from the snapshot so the
@@ -162,7 +164,7 @@ snapshot stale immediately and refreshes from the live API in the background.
 Refresh it whenever the hosted starter state changes:
 
 ```powershell
-$env:BOOTSTRAP_API_BASE_URL="https://thoughttracker-api.onrender.com/api"
+$env:BOOTSTRAP_API_BASE_URL="https://thoughttracker-api-3mm9.onrender.com/api"
 npm run snapshot:bootstrap
 ```
 

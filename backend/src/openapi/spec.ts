@@ -15,6 +15,7 @@ export const openapiSpec = {
       "Evidence-backed transcript analysis for YouTube creators. " +
       "All AI conclusions trace back to a transcript chunk and an evidence quote. " +
       "Default providers use local/real services and fail clearly when required dependencies are missing.",
+    contact: { name: "Jason Lin", url: "https://github.com/jason-lin-uo" },
     license: { name: "MIT", url: "/LICENSE" },
   },
   servers: [{ url: "http://localhost:4000", description: "Local dev" }],

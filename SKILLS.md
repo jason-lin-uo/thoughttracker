@@ -1,5 +1,7 @@
 # SKILLS.md - Portfolio Dossier
 
+Author: Jason Lin
+
 This file is the interview prep index for the current ThoughtTracker product.
 It lists the skills demonstrated by the two repos and points to the files that
 prove each claim.

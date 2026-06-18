@@ -2,6 +2,7 @@
   "name": "@thoughttracker/frontend",
   "version": "1.0.0",
   "private": true,
+  "author": "Jason Lin",
   "type": "module",
   "scripts": {
     "dev": "vite",

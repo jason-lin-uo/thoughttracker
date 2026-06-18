@@ -1,5 +1,7 @@
 # Glossary
 
+Author: Jason Lin
+
 Plain-language definitions for the terms a reviewer will see in the code,
 documentation, UI, API responses, and ML metrics. This file is intentionally
 reader-friendly: it explains the technology without asking the reader to already

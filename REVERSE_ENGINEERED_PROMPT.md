@@ -1,5 +1,7 @@
 # Reverse-Engineered Product Prompt
 
+Author: Jason Lin
+
 This is the rebuild brief for the current ThoughtTracker product. Its purpose is
 not to be a short README. Its purpose is to give a capable coding agent enough
 context to recreate the product architecture, data flow, runtime expectations,

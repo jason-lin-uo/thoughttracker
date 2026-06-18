@@ -33,6 +33,7 @@ export const en = Object.freeze({
   brand: {
     name: "ThoughtTracker",
     tagline: "See how viewpoints change over time",
+    authorByline: "Built by Jason Lin",
     openNav: "Open navigation",
     closeNav: "Close navigation",
     navMenu: "Navigation menu",

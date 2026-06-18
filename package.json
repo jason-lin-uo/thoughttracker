@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "AI-powered transcript analysis & evidence explorer for YouTube creators",
+  "author": "Jason Lin",
   "workspaces": [
     "backend",
     "frontend"

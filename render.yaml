@@ -53,7 +53,7 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: FRONTEND_URL
-        value: https://thoughttracker-web.onrender.com
+        value: https://thoughttracker-web-415a.onrender.com
 
   # ----- Frontend static site ------------------------------------------------
   # Render serves the prebuilt `frontend/dist` directory directly. The frontend
@@ -66,7 +66,7 @@ services:
     autoDeploy: true
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://thoughttracker-api.onrender.com/api
+        value: https://thoughttracker-api-3mm9.onrender.com/api
     routes:
       - type: rewrite
         source: /*

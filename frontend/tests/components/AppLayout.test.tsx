@@ -39,6 +39,7 @@ describe("AppLayout", () => {
   it("renders the brand + nav links + main", () => {
     render(wrap(<AppLayout>page content</AppLayout>));
     expect(screen.getAllByText(/ThoughtTracker/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Built by Jason Lin/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Add Creators/).length).toBeGreaterThan(0);
     expect(screen.getByText("page content")).toBeInTheDocument();
   });

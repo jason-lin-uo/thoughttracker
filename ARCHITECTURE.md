@@ -1,5 +1,7 @@
 # ThoughtTracker Architecture
 
+Author: Jason Lin
+
 This document explains how the current ThoughtTracker product is wired. It is
 written for a technical reviewer who wants to understand the real system, not an
 old scaffold. Historical decisions remain in `docs/adr/`, but this file is the
