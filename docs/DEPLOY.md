@@ -105,11 +105,11 @@ Restore `thoughttracker_hosted_free.dump` into Neon before presenting the
 product. The dump contains the real corpus and analysis rows in a storage shape
 that fits the Neon Free limit.
 
-The hosted snapshot intentionally starts with one featured report:
-**MKBHD on Foldables: Future-Ready Hardware, Real-World Tradeoffs**. After a
-recruiter session, unlock the Add Creators page with the admin PIN and use
-**Reset all reports** to clear newly generated reports and restore that same
-clean featured-report state for the next viewer.
+The hosted snapshot intentionally starts with one pre-generated report so the
+dashboard is not empty on first load. After a recruiter session, unlock the Add
+Creators page with the admin PIN and use **Reset all reports** to clear newly
+generated reports and restore that same clean starting state for the next
+viewer.
 
 ## Fly.io
 
@@ -158,8 +158,8 @@ The nginx template sends `/api/*` to the backend service.
 
 The frontend bundles `frontend/src/generated/bootstrapSnapshot.json` for a fast
 first paint on free hosting. It includes dashboard, creator list, topic list,
-reports list, and the current default report detail. React Query marks the
-snapshot stale immediately and refreshes from the live API in the background.
+reports list, and the current report detail. React Query marks the snapshot
+stale immediately and refreshes from the live API in the background.
 
 Refresh it whenever the hosted starter state changes:
 

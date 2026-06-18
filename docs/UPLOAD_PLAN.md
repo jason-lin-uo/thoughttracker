@@ -403,8 +403,8 @@ APP-PR-12 final documentation polish
 > This PR adds the visible Add Creators experience and the backend owner guard.
 > Recruiters can see that the product was designed to scale, but only the owner
 > can run mutating onboarding actions with `ADMIN_ONBOARDING_PIN`. It also adds
-> the owner-only report reset path that returns the app to the single default
-> Marques Brownlee foldable-smartphone report for the next reviewer.
+> the owner-only report reset path that returns the app to a clean
+> one-report starting state for the next reviewer.
 
 ---
 

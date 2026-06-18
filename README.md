@@ -30,24 +30,24 @@ refreshing the product snapshot.
 The hosted app is the best way to explore the product, but these screenshots
 show the core experience directly from the repository.
 
-![ThoughtTracker dashboard showing the featured Marques Brownlee foldables report, corpus totals, and five real creators.](docs/assets/screenshots/dashboard.png)
+![ThoughtTracker dashboard showing corpus totals, a featured report, and five real creators.](docs/assets/screenshots/dashboard.png)
 
 **Report view:** AI-assisted analysis is grounded in transcript evidence and a
 clickable stance trajectory.
 
-![ThoughtTracker report detail page with the MKBHD foldables stance trajectory and written summary.](docs/assets/screenshots/report-detail.png)
+![ThoughtTracker report detail page with a stance trajectory and written summary.](docs/assets/screenshots/report-detail.png)
 
 **Topic analysis:** every topic has creator-specific stance, date filtering,
 trajectory visualization, and source evidence.
 
-![ThoughtTracker topic analysis page for Marques Brownlee on foldable smartphone reviews.](docs/assets/screenshots/topic-analysis.png)
+![ThoughtTracker topic analysis page with creator-specific stance trends and transcript evidence.](docs/assets/screenshots/topic-analysis.png)
 
 ## What To Review First
 
 - Open the live app and start on the dashboard; it shows the real five-creator
-  corpus and the default Marques Brownlee foldables report.
-- Open the featured report to inspect the evidence-backed AI analysis,
-  clickable source videos, and stance trajectory.
+  corpus, topic coverage, evidence totals, and recent report activity.
+- Open any report to inspect the evidence-backed AI analysis, clickable source
+  videos, and stance trajectory.
 - Open the Topic Analysis page for Foldable Smartphone Reviews to see per-video
   stance, date filtering, trajectory visualization, and transcript evidence.
 - Review [`ARCHITECTURE.md`](ARCHITECTURE.md), [`docs/DEPLOY.md`](docs/DEPLOY.md),
@@ -201,10 +201,9 @@ npm run dev:full
   evidence, and reports, but removes redundant full-transcript copies from the
   `Transcript` table so it can fit small hosted Postgres plans.
 
-Both snapshots start with exactly one generated report: Marques Brownlee on
-Foldable Smartphone Reviews. The dashboard features that report by default, so
-a fresh local install or hosted reset never opens with an empty report surface.
-The owner can restore this state from the PIN-gated Add Creators admin panel.
+Both snapshots include one pre-generated report so a fresh local install or
+hosted reset never opens with an empty report surface. The owner can restore
+that clean starting state from the PIN-gated Add Creators admin panel.
 
 ### Manual Path
 
