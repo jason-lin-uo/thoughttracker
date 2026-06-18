@@ -1,0 +1,57 @@
+{
+  "name": "thoughttracker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-powered transcript analysis & evidence explorer for YouTube creators",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "install:all": "npm install && npm install --workspace backend && npm install --workspace frontend",
+    "doctor": "node scripts/doctor.mjs",
+    "dev": "node scripts/doctor.mjs && node scripts/start-postgres.mjs && npm run dev:app",
+    "dev:app": "npm run setup:local-ai && concurrently -n backend,frontend -c blue,magenta \"npm run dev --workspace backend\" \"npm run dev --workspace frontend\"",
+    "dev:full": "node scripts/doctor.mjs --with-ml && node scripts/start-postgres.mjs && concurrently -n ml,backend,frontend -c green,blue,magenta \"node scripts/start-ml-service.mjs\" \"npm run dev --workspace backend\" \"npm run dev --workspace frontend\"",
+    "dev:backend": "npm run dev --workspace backend",
+    "dev:frontend": "npm run dev --workspace frontend",
+    "setup:local": "node scripts/setup-local.mjs",
+    "setup:local:full": "node scripts/setup-local.mjs --with-ml",
+    "setup:local-ai": "node scripts/setup-local-ai.mjs",
+    "snapshot:bootstrap": "node scripts/generate-bootstrap-snapshot.mjs",
+    "check:local-ai": "node scripts/setup-local-ai.mjs --check-only",
+    "build": "npm run build --workspace backend && npm run build --workspace frontend",
+    "db:generate": "npm run db:generate --workspace backend",
+    "db:migrate": "npm run db:migrate --workspace backend",
+    "db:push": "npm run db:push --workspace backend",
+    "db:seed": "npm run db:seed --workspace backend",
+    "db:reset": "npm run db:reset --workspace backend",
+    "typecheck": "npm run typecheck --workspace backend && npm run typecheck --workspace frontend",
+    "lint": "npm run lint --workspace backend && npm run lint --workspace frontend",
+    "test": "npm run test --workspace backend && npm run test --workspace frontend",
+    "test:backend": "npm run test --workspace backend",
+    "test:frontend": "npm run test --workspace frontend",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install --with-deps chromium",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "backend/src/**/*.ts": [
+      "eslint --max-warnings 0",
+      "bash -c 'cd backend && tsc --noEmit'"
+    ],
+    "frontend/src/**/*.{ts,tsx}": [
+      "eslint --max-warnings 0",
+      "bash -c 'cd frontend && tsc -b --noEmit'"
+    ]
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.11.3",
+    "@playwright/test": "^1.60.0",
+    "@types/express": "^4.17.21",
+    "axe-core": "^4.11.4",
+    "concurrently": "^9.0.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.2"
+  }
+}
