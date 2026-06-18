@@ -87,6 +87,20 @@ function runDockerCompose(args) {
   run(command, composeArgs);
 }
 
+function dockerContainerIsRunning(name) {
+  const result = spawnSync(
+    "docker",
+    ["ps", "--filter", `name=^/${name}$`, "--filter", "status=running", "--format", "{{.Names}}"],
+    { encoding: "utf8" },
+  );
+
+  if (result.error || result.status !== 0) return false;
+  return result.stdout
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .includes(name);
+}
+
 function waitForTcp(host, port, timeoutMs) {
   const start = Date.now();
   return new Promise((resolve, reject) => {
@@ -132,6 +146,20 @@ function ensurePortFree(host, port, label) {
     });
     server.listen(port, host);
   });
+}
+
+async function ensurePostgresPortReadyForCompose() {
+  try {
+    await ensurePortFree("127.0.0.1", 5432, "Postgres");
+  } catch (err) {
+    if (dockerContainerIsRunning(postgresContainer)) {
+      console.log(`Postgres port 5432 is already served by ${postgresContainer}.`);
+      return;
+    }
+    fail(
+      `${err.message}\nPort 5432 must be free, or already owned by the ${postgresContainer} Docker container.`,
+    );
+  }
 }
 
 function findPythonCommand() {
@@ -209,6 +237,7 @@ async function main() {
     fail(`Expected the ML repo at ${mlDir}. Set THOUGHTTRACKER_ML_DIR if it lives elsewhere.`);
   }
   await ensurePortFree("127.0.0.1", 4000, "Backend").catch((err) => fail(err.message));
+  await ensurePostgresPortReadyForCompose();
 
   log("Preparing env files");
   ensureFileFromExample(path.join(rootDir, ".env"), path.join(rootDir, ".env.example"));

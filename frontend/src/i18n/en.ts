@@ -174,14 +174,14 @@ export const en = Object.freeze({
     unlocking: "Checking...",
     lockHint:
       "Enter the admin PIN above to enable creator onboarding controls.",
-    reportResetTitle: "Report reset",
+    reportResetTitle: "Report library reset",
     reportResetDescription:
-      "Clear every generated report and restore the default Marques Brownlee report on foldable smartphone reviews.",
+      "Clear generated reports and restore the clean report library state used by fresh installs.",
     reportResetButton: "Reset all reports",
     reportResetting: "Resetting...",
     reportResetConfirm:
-      "Reset reports back to the default Marques Brownlee foldable smartphone review report?",
-    reportResetDone: "Featured report restored: {title}",
+      "Reset reports to the clean report library state? This removes generated reports.",
+    reportResetDone: "Report library reset: {title}",
     urlsLabel: "Creator URLs",
     urlsPlaceholder:
       "https://www.youtube.com/@creator\nhttps://www.youtube.com/@anothercreator",
@@ -533,7 +533,7 @@ export const en = Object.freeze({
     reportsDeletedTitle: "Reports deleted",
     reportsDeletedBody: "The selected reports have been removed.",
     reportsResetTitle: "Reports reset",
-    reportsResetBody: "The featured report is ready on the dashboard.",
+    reportsResetBody: "The report library is ready on the dashboard.",
   },
 
   /* Stance verdict copy — words, never color alone (WCAG 1.4.1) */

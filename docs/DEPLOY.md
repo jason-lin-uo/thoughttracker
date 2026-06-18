@@ -161,7 +161,7 @@ first paint on free hosting. It includes dashboard, creator list, topic list,
 reports list, and the current report detail. React Query marks the snapshot
 stale immediately and refreshes from the live API in the background.
 
-Refresh it whenever the hosted starter state changes:
+Refresh it whenever the hosted saved-report state changes:
 
 ```powershell
 $env:BOOTSTRAP_API_BASE_URL="https://thoughttracker-api-3mm9.onrender.com/api"

@@ -63,7 +63,7 @@ drift is reviewable in any PR that adds/changes an endpoint.
   counters) — Creator, Video, Topic, Report, ImportJob, etc.
 - Recently-added surface worth knowing: `GET /api/reports` is paginated,
   `POST /api/reports/bulk-delete` deletes by id-set or all (admin),
-  `POST /api/reports/reset-starter` restores the clean one-report state
+  `POST /api/reports/reset-starter` restores the clean saved-report state
   (admin), report generation is async (202 + `QueuedRun { analysisRunId }`),
   and the `Dashboard` schema includes the nullable `featuredInsight` hero.
 

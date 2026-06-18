@@ -863,6 +863,29 @@ describe("embeddingClient", () => {
     await expect(embedText("hello world")).rejects.toThrow(/ml_embedding_503/);
   });
 
+  it("embedText rejects explicit mock vectors from the ML service", async () => {
+    process.env.EMBEDDING_PROVIDER = "ml";
+    process.env.ML_CLASSIFIER_URL = "http://ml.test";
+    global.fetch = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            vectors: [[1, 0, 0]],
+            modelVersion: "mock",
+            mockInference: true,
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        ),
+    ) as typeof fetch;
+
+    await expect(embedText("hello world")).rejects.toThrow(
+      /ml_embedding_mock_inference/,
+    );
+  });
+
   it("embedText supports OpenAI embeddings when explicitly configured", async () => {
     process.env.EMBEDDING_PROVIDER = "openai";
     const vector = Array.from({ length: 3 }, (_, i) => (i === 1 ? 1 : 0));

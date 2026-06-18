@@ -50,6 +50,8 @@ Supported providers:
 
 Runtime embedding failures throw. This is deliberate: fake vectors would
 disconnect stored artifacts from the analyzed corpus.
+If the ML service explicitly returns `mockInference: true`, the backend treats
+that as a failure and refuses to save the vector.
 
 ## `mlClassifierClient.ts`
 

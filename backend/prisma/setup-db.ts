@@ -42,7 +42,7 @@ export async function ensureVectorExtensionAndIndex(
 
   /*
    * The native column only exists once `prisma db push` has applied the
-   * Unsupported("vector(64)") field. Guard the index creation on the column
+   * Unsupported("vector(768)") field. Guard the index creation on the column
    * being present so a partial setup doesn't throw.
    */
   const columns = await prisma.$queryRawUnsafe<Array<{ column_name: string }>>(

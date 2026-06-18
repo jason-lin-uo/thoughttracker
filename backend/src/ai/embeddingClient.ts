@@ -90,7 +90,9 @@ async function embedViaMl(text: string): Promise<EmbeddingResult> {
     const data = (await res.json()) as {
       vectors?: number[][];
       modelVersion?: string;
+      mockInference?: boolean;
     };
+    if (data.mockInference) throw new Error("ml_embedding_mock_inference");
     const vector = data.vectors?.[0] ?? [];
     if (vector.length === 0) throw new Error("empty_vector");
     return { vector, model: data.modelVersion ?? "ml-distilbert" };

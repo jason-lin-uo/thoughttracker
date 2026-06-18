@@ -372,7 +372,7 @@ describe("AddCreatorsPage", () => {
     expect(confirmSpy).toHaveBeenCalled();
     expect(
       screen.getByText(
-        /Featured report restored: MKBHD on Foldables: Future-Ready Hardware, Real-World Tradeoffs/i,
+        /Report library reset: MKBHD on Foldables: Future-Ready Hardware, Real-World Tradeoffs/i,
       ),
     ).toBeInTheDocument();
     confirmSpy.mockRestore();

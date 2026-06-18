@@ -199,9 +199,9 @@ need — like a microwave meal vs. cooking from scratch).
   app with one command, I don't care what's inside."
 
 **Why they exist:** containers let anyone run the project on any computer
-(Mac, Windows, Linux) without installing Postgres, Node, or anything else.
-Especially valuable for recruiters who want to click "see demo" without
-spending an hour setting up a database.
+(Mac, Windows, Linux) without installing Postgres directly. The recommended
+local path still uses Node/npm for fast development, while Docker owns the
+database lifecycle.
 
 **Used by:** `docker compose up`. The `full.yml` is referenced in
 `docs/DEPLOY.md`.
@@ -211,14 +211,15 @@ spending an hour setting up a database.
 ### `render.yaml`
 
 **What it is:** a **Blueprint** for Render.com (a cloud hosting service).
-It tells Render: "create a Postgres database called `thoughttracker-db`,
-a Docker-backed web service for the backend, and a static-site service
-for the frontend. Wire them together."
+It tells Render: "create a Docker-backed web service for the backend and a
+static-site service for the frontend. Wire them together." The database is an
+existing pgvector-capable hosted Postgres instance, usually Neon Free, restored
+from the trimmed hosted dump before the services go live.
 
-**Why it exists:** so deploying the project to Render is one command
-(`render blueprint deploy`) instead of clicking through their dashboard
-20 times. Render is free for small projects, which makes it ideal for
-hosting a portfolio demo recruiters can click.
+**Why it exists:** so the public portfolio deployment is repeatable instead of
+being a pile of dashboard-only settings. Render's free tier is slower than a
+paid service, but it is enough for the read-only hosted app path once the data
+lives in Neon and the frontend caches common reads.
 
 **Used by:** Render's blueprint system (when you run the deploy command).
 Documented in `docs/DEPLOY.md`.

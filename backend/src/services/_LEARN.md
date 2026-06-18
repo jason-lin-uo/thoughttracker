@@ -24,7 +24,7 @@ specializes:
   creators
 - **The YouTube-import chef** brings in new transcripts from outside
 - **The report chef** writes the long-form analyses
-- **The featured-report chef** restores the clean one-report state
+- **The report-library reset chef** restores the clean saved-report state
 - **The evidence chef** fetches and contextualizes individual evidence
   rows
 - **The embedding chef** turns chunks into vectors for owner/offline
@@ -329,13 +329,13 @@ enqueues - see `controllers/reports.controller.ts`).
 
 **What it does:** `resetReportsToStarter()` deletes every generated `Report`
 row, then recreates exactly one deterministic topic report: Marques Brownlee on
-foldable smartphone reviews. `buildStarterReport()` shapes that report from
+foldable smartphone reviews. `buildStarterReport()` shapes that saved report from
 real timeline rows, per-video summaries, and transcript evidence already in the
 database.
 
 **Why it exists:** the public hosted app is shared by multiple interviewers,
 and local installs should open in the same clean state. This service gives the
-owner one reset action that returns both experiences to a useful default without
+owner one reset action that returns both experiences to a clean saved state without
 calling OpenAI, Ollama, or the ML service.
 
 **Used by:** `controllers/reports.controller.ts:resetReportsToStarterController`

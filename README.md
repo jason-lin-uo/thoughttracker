@@ -318,7 +318,7 @@ The hosted free path has two performance layers:
 - the frontend bundles a small real-data bootstrap snapshot so the first
   dashboard/list pages can paint before Render/Neon finish a live refresh.
 
-Refresh the bundled snapshot after changing the hosted starter data:
+Refresh the bundled snapshot after changing the hosted saved-report state:
 
 ```powershell
 $env:BOOTSTRAP_API_BASE_URL="https://thoughttracker-api-3mm9.onrender.com/api"

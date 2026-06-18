@@ -827,8 +827,7 @@ export const openapiSpec = {
     "/api/reports/reset-starter": {
       post: {
         tags: ["Reports"],
-        summary:
-          "Reset all reports to the default Marques Brownlee foldable-phone report (admin)",
+        summary: "Reset reports to the clean saved-report state (admin)",
         parameters: [
           {
             name: "X-Admin-Pin",
@@ -840,7 +839,7 @@ export const openapiSpec = {
         responses: {
           "200": {
             description:
-              "Reports reset; returns { deleted, report } for the clean one-report state",
+              "Reports reset; returns { deleted, report } for the clean saved-report state",
           },
           "403": { description: "Admin PIN required" },
           "404": { description: "Starter creator/topic missing" },

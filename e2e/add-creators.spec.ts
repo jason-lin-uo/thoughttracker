@@ -77,7 +77,7 @@ test.describe("Add Creators admin onboarding", () => {
     await page.getByRole("button", { name: "Reset all reports" }).click();
     await expect(
       page.getByText(
-        "Featured report restored: MKBHD on Foldables: Future-Ready Hardware, Real-World Tradeoffs",
+        "Report library reset: MKBHD on Foldables: Future-Ready Hardware, Real-World Tradeoffs",
       ),
     ).toBeVisible();
     expect(resetPosts.every((headers) => headers["x-admin-pin"] === "2468")).toBe(

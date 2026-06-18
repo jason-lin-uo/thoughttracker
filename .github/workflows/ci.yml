@@ -132,7 +132,7 @@ jobs:
         run: |
           set -e
           # Fail on anything that looks like an API key or token.
-          if grep -RIn -E "(AKCp[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AIza[0-9A-Za-z_-]{30,}|ghp_[A-Za-z0-9]{20,}|xoxb-[A-Za-z0-9-]+)" \
+          if grep -RIn -E "(AKCp[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9]{20,}|sk-ant-[A-Za-z0-9_-]{20,}|AIza[0-9A-Za-z_-]{30,}|ghp_[A-Za-z0-9]{20,}|xoxb-[A-Za-z0-9-]+|npg_[A-Za-z0-9]{10,})" \
             --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=dist --exclude-dir=models . ; then
             echo "::error::Possible secret detected; refusing to merge."
             exit 1

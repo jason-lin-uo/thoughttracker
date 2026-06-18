@@ -36,7 +36,7 @@ but prefer pgvector when the extension is available.
 The original version used:
 
 - `vectorJson`: portable JSON fallback
-- `vector(64)`: optional native pgvector column
+- `vector(768)`: optional native pgvector column
 
 The current version uses the same architectural idea with 768-dimensional
 vectors and a stronger preference for native pgvector storage.
