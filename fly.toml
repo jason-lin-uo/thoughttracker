@@ -1,0 +1,79 @@
+# Fly.io app config for the ThoughtTracker backend API.
+#
+# Deploy with:
+#   fly launch --no-deploy   # one-time, creates the app + Fly Postgres
+#   fly deploy               # rebuilds the image and rolls out a new release
+#
+# Required secrets (set with `fly secrets set KEY=value`):
+#   DATABASE_URL — pulled from a Fly Postgres app or external Postgres
+#
+# Optional hosted provider secrets:
+#   AI_API_KEY, AI_PROVIDER, AI_MODEL, EMBEDDING_PROVIDER, ML_CLASSIFIER_URL
+#
+# The frontend can be deployed separately (e.g. Render static site or a Fly
+# nginx app pointed at the same backend) — see `frontend/Dockerfile.production`.
+
+app = "thoughttracker-api"
+primary_region = "iad"
+
+[build]
+  dockerfile = "backend/Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "4000"
+  LOG_LEVEL = "info"
+  # Report/LLM writing uses a REAL provider. Set the key with
+  # `fly secrets set AI_API_KEY=...` to enable runtime generation. The seeded
+  # reports are already real (LLM-written, baked into the DB), so the demo shows
+  # real content even before a key is set. NEW generation requires a configured
+  # provider and fails clearly if one is unavailable.
+  AI_PROVIDER = "openai"
+  EMBEDDING_PROVIDER = "ml"
+  ML_CLASSIFIER_URL = "https://thoughttracker-ml.example.com"
+  # Stance/topic labels come from the seeded analysis; only affects NEW ingestion.
+  STANCE_ANALYSIS_PROVIDER = "custom_ml"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 4000
+  processes = ["app"]
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 250
+    soft_limit = 200
+
+  # Health probe — must hit /api/health within 10s or the instance is bounced.
+  [[services.http_checks]]
+    interval = "10s"
+    timeout = "5s"
+    grace_period = "30s"
+    method = "get"
+    path = "/api/health"
+    protocol = "http"
+
+[deploy]
+  # Sync the schema, then create the pgvector extension + HNSW index, before
+  # swapping in the new release.
+  #
+  # We use `prisma db push` (not `migrate deploy`) because the project has no
+  # committed `prisma/migrations/` directory — dev, CI, and Docker all create
+  # the schema via `db push`, so the deploy path must match or the release
+  # would fail with "No migration found". `db push` doesn't create extensions
+  # or the ANN index, so `db:setup` (idempotent raw SQL via the Prisma client)
+  # follows to make the "HNSW-indexed cosine ANN" path real in prod.
+  #
+  # WORKDIR in the runtime image is /app/backend and the build compiles
+  # prisma/setup-db.ts to dist/prisma/setup-db.js, so paths are relative to
+  # /app/backend and we run the compiled file (no tsx in the prod image).
+  release_command = "sh -c 'npx prisma db push --schema prisma/schema.prisma --skip-generate && node dist/prisma/setup-db.js'"
