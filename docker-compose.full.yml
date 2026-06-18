@@ -1,0 +1,67 @@
+# Full-stack compose: Postgres + backend + frontend + (optional) ML service.
+# For just-Postgres dev, use the simpler `docker-compose.yml`.
+#
+# This file expects Dockerfiles in backend/, frontend/, and ../thoughttracker-ml/.
+# Build them with `docker compose -f docker-compose.full.yml build` and then
+# `docker compose -f docker-compose.full.yml up`.
+#
+# Full compose uses real/local providers. If a required dependency is missing,
+# startup or runtime operations fail clearly instead of generating fake data.
+
+services:
+  postgres:
+    extends:
+      file: docker-compose.yml
+      service: postgres
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: thoughttracker-backend:local
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/thoughttracker?schema=public
+      PORT: 4000
+      FRONTEND_URL: http://localhost:5173
+      DEMO_MODE: "true"
+      AI_PROVIDER: local
+      LOCAL_LLM_BASE_URL: http://host.docker.internal:11434
+      EMBEDDING_PROVIDER: ml
+      ML_CLASSIFIER_URL: http://ml:8000
+      YOUTUBE_PROVIDER: youtube
+      STANCE_ANALYSIS_PROVIDER: custom_ml
+      ADMIN_ONBOARDING_PIN: ${ADMIN_ONBOARDING_PIN:?Set ADMIN_ONBOARDING_PIN before running full compose}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "4000:4000"
+    command: sh -c "npx prisma db push && tsx prisma/setup-db.ts && tsx src/server.ts"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: thoughttracker-frontend:local
+    environment:
+      VITE_API_BASE_URL: http://localhost:4000/api
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    command: ["npm", "run", "dev", "--", "--host"]
+
+  ml:
+    build:
+      context: ../thoughttracker-ml
+      dockerfile: Dockerfile
+    image: thoughttracker-ml:local
+    environment:
+      API_HOST: 0.0.0.0
+      API_PORT: 8000
+      TOPIC_RELEVANCE_MAX_LENGTH: 512
+    ports:
+      - "8000:8000"
+
+volumes:
+  thoughttracker_pgdata:
