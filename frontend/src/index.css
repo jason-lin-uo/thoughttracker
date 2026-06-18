@@ -1,0 +1,273 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+/*
+ * Tie native-control rendering (date-picker calendar icon, select arrows, etc.)
+ * to the APP's theme — NOT the OS. `color-scheme: light dark` defers to the OS
+ * `prefers-color-scheme`, so with the app toggled to light but the OS in dark
+ * mode, the native date-picker icon rendered white-on-white (invisible in light
+ * mode). Driving color-scheme from our own `.dark` class (added by ThemeProvider)
+ * keeps native controls legible in whichever theme the user actually selected.
+ */
+:root {
+  color-scheme: light;
+}
+.dark {
+  color-scheme: dark;
+}
+
+/* -----------------------------------------------------------------------
+ * Stance color CSS variables (the "analyst console" 4-stance palette).
+ *
+ * These mirror `theme/tokens.ts` (STANCE_TOKENS) exactly and exist so the
+ * console widgets — trajectory dots, ribbon segments, heatmap cells,
+ * verdict bar, blockquote rules — can paint their stance colors purely from
+ * CSS (`var(--stance-supportive)` …) without each component re-resolving the
+ * theme in JS. The `:root` block is LIGHT MODE (the default); the `.dark`
+ * override (added on `<html>` by ThemeProvider) flips every value to the
+ * brighter dark-mode hue, so the dark toggle restyles every stance surface.
+ *
+ * Keep these in lock-step with STANCE_TOKENS: same hex, same families.
+ * ----------------------------------------------------------------------- */
+:root {
+  --stance-supportive: #0f766e;
+  --stance-mixed: #b45309;
+  --stance-neutral: #64748b;
+  --stance-opposed: #be123c;
+  --stance-supportive-bg: #ccfbf1;
+  --stance-mixed-bg: #fef3c7;
+  --stance-neutral-bg: #e2e8f0;
+  --stance-opposed-bg: #ffe4e6;
+}
+.dark {
+  --stance-supportive: #2dd4bf;
+  --stance-mixed: #fbbf24;
+  --stance-neutral: #94a3b8;
+  --stance-opposed: #fb7185;
+  --stance-supportive-bg: #0c2e2a;
+  --stance-mixed-bg: #332708;
+  --stance-neutral-bg: #1e293b;
+  --stance-opposed-bg: #3a1620;
+}
+
+body {
+  @apply bg-ink-50 text-ink-900 antialiased dark:bg-ink-950 dark:text-ink-100;
+  font-feature-settings: "cv02", "cv03", "cv04", "ss01";
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-ink-200 dark:bg-ink-700 rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-ink-300 dark:bg-ink-600;
+}
+
+/* Visible focus ring for keyboard users (a11y). */
+:focus-visible {
+  outline: 2px solid theme("colors.brand.500");
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* -----------------------------------------------------------------------
+ * Inset focus ring for FULL-BLEED rows inside clipped containers.
+ *
+ * The default ring sits 2px OUTSIDE the element (outline-offset: 2px). For a
+ * full-bleed row/link that spans a rounded `overflow-hidden` list (the evidence
+ * list, the creator page's recent-transcripts <ul>) the row's box touches the
+ * container edges, so the outer ring is shaved off by the clip — you'd see only
+ * one or two edges. Drawing the ring INSET (and rounding it to match the
+ * container's corners) keeps the full rectangle visible without removing the
+ * clip the rounded corners need.
+ *
+ * IMPORTANT: this is opt-in via `.focus-inset` (and `.evidence-row`), NOT a
+ * blanket `.overflow-hidden *` rule. Inline links inside table/grid cells (the
+ * videos & import-job tables) are NOT full-bleed — they have cell padding, so
+ * the default OUTSET ring fits without clipping, and an inset ring there would
+ * cut into the text. Only tag elements whose box actually reaches the edge.
+ * ----------------------------------------------------------------------- */
+.evidence-row:focus-visible,
+.focus-inset:focus-visible {
+  outline-offset: -2px;
+  border-radius: 0.75rem;
+}
+
+/* -----------------------------------------------------------------------
+ * @layer components
+ *
+ * Named utility classes for patterns that repeat 3+ times across the app.
+ * Tailwind's `@apply` keeps the single source of truth in CSS while letting
+ * us still use utility classes at call sites — the goal is less busy JSX
+ * without abandoning Tailwind's compositional model.
+ *
+ * Guidelines:
+ *   - Add a class here when the same combo of utilities shows up 3+ times.
+ *   - Keep names semantic (`.section-h2`) not visual (`.text-lg-mb-3`).
+ *   - Pair light + dark variants on the same class.
+ * ----------------------------------------------------------------------- */
+@layer components {
+  /* ====== Surface primitives ====== */
+  .card {
+    @apply bg-white border border-ink-200 rounded-xl shadow-card
+           dark:bg-ink-900 dark:border-ink-800;
+  }
+  .card-pad {
+    @apply p-4 sm:p-6;
+  }
+  .card-pad-sm {
+    @apply p-3 sm:p-4;
+  }
+  /* Generous padding for hero / feature surfaces (StanceTimeline, the
+   * dashboard's "biggest shift" highlight) — more breathing room than a
+   * standard card so the centerpiece reads as the page's focal point. */
+  .card-pad-lg {
+    @apply p-6 sm:p-8;
+  }
+
+  /* ====== Form controls ====== */
+  .input {
+    @apply w-full border border-ink-300 rounded-lg px-3 py-2 text-sm bg-white text-ink-900
+           focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent
+           dark:bg-ink-900 dark:border-ink-700 dark:text-ink-100 dark:placeholder-ink-500;
+  }
+  .label {
+    @apply block text-xs font-medium text-ink-600 mb-1 uppercase tracking-wide
+           dark:text-ink-400;
+  }
+
+  /* ====== Buttons ====== */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+           transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-brand-600 text-white hover:bg-brand-700
+           dark:bg-brand-500 dark:hover:bg-brand-400;
+  }
+  .btn-secondary {
+    @apply btn bg-white border border-ink-300 text-ink-800 hover:bg-ink-50
+           dark:bg-ink-900 dark:border-ink-700 dark:text-ink-100 dark:hover:bg-ink-800;
+  }
+  .btn-ghost {
+    @apply btn text-ink-700 hover:bg-ink-100
+           dark:text-ink-200 dark:hover:bg-ink-800;
+  }
+
+  /* ====== Typography helpers ======
+   * Bigger, clearer headings and a calmer body, tuned for the redesign's
+   * Linear/Vercel-style hierarchy. `tracking-tight` on headings tightens
+   * the larger sizes so they read crisp rather than airy. */
+  .section-h2 {
+    @apply text-xl font-semibold tracking-tight text-ink-900 dark:text-ink-50 mb-4;
+  }
+  .section-eyebrow {
+    @apply text-xs font-medium uppercase tracking-wide text-ink-500 dark:text-ink-400;
+  }
+  .body-muted {
+    @apply text-sm text-ink-600 dark:text-ink-400;
+  }
+  .body-strong {
+    @apply text-sm text-ink-800 dark:text-ink-200;
+  }
+  .link-brand {
+    @apply text-brand-700 hover:underline dark:text-brand-300;
+  }
+  /* Section header row: title on the left, a "View all" link on the right.
+   * Pairs with `.section-h2`; replaces the repeated flex/justify/mb-3 combo
+   * that opened most dashboard/index sections. */
+  .section-head {
+    @apply flex items-center justify-between mb-4;
+  }
+
+  /* ====== Layout grids ====== */
+  .filter-grid {
+    @apply card card-pad grid sm:grid-cols-2 lg:grid-cols-4 gap-3;
+  }
+  .stats-grid {
+    @apply grid grid-cols-2 md:grid-cols-4 gap-4;
+  }
+  /* Consistent responsive card grid used by the creator/report/topic
+   * grids so every index lands on the same column rhythm + gutter. */
+  .card-grid {
+    @apply grid sm:grid-cols-2 lg:grid-cols-3 gap-5;
+  }
+
+  /* ====== Empty + meta blocks ====== */
+  .empty-msg {
+    @apply card card-pad text-sm text-ink-500 dark:text-ink-400;
+  }
+  .meta-row {
+    @apply text-xs text-ink-500 dark:text-ink-400;
+  }
+
+  /* ====== Table primitives (used on Videos / ImportJob detail) ====== */
+  .data-table {
+    @apply w-full text-sm;
+  }
+  .data-table-head {
+    @apply bg-ink-50 dark:bg-ink-900 text-left text-xs uppercase tracking-wide
+           text-ink-500 dark:text-ink-400;
+  }
+  .data-table-body {
+    @apply divide-y divide-ink-100 dark:divide-ink-800;
+  }
+
+  /* ====== Caveat panel (used on report detail) ====== */
+  .caveat-panel {
+    @apply card card-pad bg-amber-50 border-amber-200
+           dark:bg-amber-950/30 dark:border-amber-900/60;
+  }
+
+  /* -----------------------------------------------------------------------
+   * Analyst-console primitives (the topic-analysis centerpiece)
+   *
+   * These back the redesigned topic-analysis page prototype. They lean
+   * on the `--stance-*` CSS variables above so every stance surface flips
+   * with the dark toggle automatically. Kept here (not inline) so the dense
+   * console markup reads cleanly at the call sites.
+   * --------------------------------------------------------------------- */
+
+  /* Section eyebrow above each console panel ("Stance trajectory" etc.). */
+  .console-eyebrow {
+    @apply text-[10.5px] font-semibold uppercase tracking-[0.16em]
+           text-ink-500 dark:text-ink-400 mt-6 mb-2;
+  }
+  /* A console surface panel — slightly rounder + softer than a plain card. */
+  .console-panel {
+    @apply bg-white border border-ink-200 rounded-2xl shadow-card p-4 sm:p-5
+           dark:bg-ink-900 dark:border-ink-800;
+  }
+
+  /* The proportional stance ribbon track + its segments. */
+  .stance-ribbon {
+    @apply flex h-4 flex-1 overflow-hidden rounded-full border border-ink-200 dark:border-ink-800;
+  }
+
+  /* One per-video heatmap cell; the stance color is set inline per cell. */
+  .heat-cell {
+    @apply h-[30px] w-[30px] rounded-lg cursor-pointer border border-black/10 dark:border-white/10
+           transition-transform hover:-translate-y-0.5 hover:shadow-md
+           focus-visible:outline-offset-2;
+  }
+
+  /* Evidence row: compact, non-intrusive, expands on click. */
+  .evidence-row {
+    @apply w-full flex items-center gap-3 px-3.5 py-2.5 text-sm text-left
+           hover:bg-ink-50 dark:hover:bg-ink-800/60 transition-colors;
+  }
+  /* A stance "square" swatch leading an evidence row / legend item. */
+  .stance-square {
+    @apply inline-block h-2.5 w-2.5 rounded-[3px] shrink-0;
+  }
+}
