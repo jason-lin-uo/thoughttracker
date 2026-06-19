@@ -230,10 +230,10 @@ On Windows use:
 Current verified status:
 
 - backend typecheck passes
-- backend Vitest passes: 721 tests
+- backend Vitest passes: 726 tests
 - frontend typecheck passes
-- frontend Vitest passes: 328 tests
-- ML pytest passes: 183 tests, 100% coverage
+- frontend Vitest passes: 332 tests
+- ML pytest passes: 192 tests, 100% coverage
 
 ## Troubleshooting
 

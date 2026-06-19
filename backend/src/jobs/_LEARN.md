@@ -180,9 +180,9 @@ transcript files from a folder, creates the corresponding DB rows, and
 chains into `analyzeVideoJob` per video.
 
 **Why it exists:** the `importChannel.job.ts` flow assumes a working
-YouTube provider. For demo data shipping with the repo, or for cases
-where transcripts were fetched offline (PERSONAL_MACHINE_SETUP.md
-covers this), this is the entry point.
+YouTube provider. For real transcript folders already fetched and stored
+with the project, or for owner workflows where transcripts were fetched
+offline (`PERSONAL_MACHINE_SETUP.md` covers this), this is the entry point.
 
 **Two payload shapes accepted:** `{ folderPath: "..." }` for a
 real path on disk, or `{ inline: { manifest, transcripts } }` for

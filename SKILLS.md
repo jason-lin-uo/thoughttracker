@@ -78,10 +78,10 @@ prove each claim.
 Current verified status:
 
 - Backend typecheck passes.
-- Backend Vitest passes: 719 tests.
+- Backend Vitest passes: 726 tests.
 - Frontend typecheck passes.
-- Frontend Vitest passes: 328 tests.
-- ML pytest passes: 183 tests with 100% coverage.
+- Frontend Vitest passes: 332 tests.
+- ML pytest passes: 192 tests with 100% coverage.
 
 ## Architecture And Reliability
 

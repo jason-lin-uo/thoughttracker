@@ -6,20 +6,17 @@ showcase, but PRs and issues are welcome.
 ## Quick dev loop
 
 ```bash
-docker compose up -d # start Postgres
-npm install # install workspaces
-npm run db:push # apply Prisma schema
-npm run db:seed # optional: seed deterministic test fixtures into a *_test DB
-npm run dev # start backend + frontend
+npm run setup:local # first-time real snapshot + Ollama setup
+npm run dev # start Postgres, backend, and frontend
 ```
 
 Open <http://localhost:5173>.
 
 ## Project layout
 
-- `backend/` — Express + TypeScript + Prisma API
-- `frontend/` — React + Vite + Tailwind UI
-- `../thoughttracker-ml/` — optional Python ML classifier (sibling repo)
+- `backend/` - Express + TypeScript + Prisma API
+- `frontend/` - React + Vite + Tailwind UI
+- `../thoughttracker-ml/` - optional Python ML/reanalysis pipeline (sibling repo)
 
 See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the data-flow diagram and the
 [`docs/adr/`](./docs/adr/) directory for design decisions.

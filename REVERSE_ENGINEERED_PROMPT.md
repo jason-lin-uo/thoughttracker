@@ -401,11 +401,22 @@ costly or mutating operations.
 
 ## 11. Local Setup Flow
 
-Recommended reviewer setup:
+Recommended reviewer setup should be the one-command real-data path:
 
 ```bash
 git lfs install
 git lfs pull
+npm run setup:local
+npm run dev
+```
+
+`setup:local` should handle env-file creation, dependency installation, Docker
+Postgres startup, real dump restore, pgvector/index setup, Prisma client
+generation, and local Ollama model verification.
+
+The older manual path should remain available only as a debugging fallback:
+
+```bash
 npm install
 cp .env.example .env
 cp .env.example backend/.env
@@ -422,18 +433,6 @@ cd ../thoughttracker-ml
 python -m venv .venv
 python -m pip install -r requirements.txt
 python -m uvicorn src.api.main:app --host 127.0.0.1 --port 8000
-```
-
-Start local report generation:
-
-```bash
-npm run setup:local-ai
-```
-
-Start the app:
-
-```bash
-npm run dev
 ```
 
 The frontend usually runs at `http://localhost:5173`, unless Vite selects a

@@ -1,4 +1,4 @@
-# \_LEARN.md — `backend/src/openapi/`
+# \_LEARN.md - `backend/src/openapi/`
 
 > One file. The public menu of every URL the backend serves.
 
@@ -11,10 +11,10 @@ ingredient, every price, in one document. Customers consult it before
 ordering. Health inspectors verify the kitchen against it. New cooks
 read it to learn what's served.
 
-That's what `spec.ts` is — a machine-readable menu of every HTTP
+That's what `spec.ts` is - a machine-readable menu of every HTTP
 endpoint, request shape, response shape, and error code the backend
 supports. It's an **OpenAPI 3** document (OpenAPI is the industry's
-standard "menu format" — any tool that reads it knows how to draw an
+standard "menu format" - any tool that reads it knows how to draw an
 interactive menu, generate client code, or run health checks against
 the API).
 
@@ -37,18 +37,18 @@ overkill for a menu this small).
 
 **Why it exists:** the alternatives were:
 
-1. **No spec at all** — bad; clients have to read source to learn the
+1. **No spec at all** - bad; clients have to read source to learn the
    API.
-2. **Hand-write a YAML/JSON file** — bad; drifts out of sync with the
+2. **Hand-write a YAML/JSON file** - bad; drifts out of sync with the
    actual code instantly.
-3. **Use a heavy library like NestJS Swagger** — overkill for the
+3. **Use a heavy library like NestJS Swagger** - overkill for the
    project's size.
-4. **Use Zod-to-OpenAPI** — nice, but requires Zod schemas on every
+4. **Use Zod-to-OpenAPI** - nice, but requires Zod schemas on every
    endpoint, which we don't have.
 
 The chosen path: a small TypeScript file that mirrors the route
 structure, written by hand but co-located with the code. It's not
-auto-generated, so it can drift — but it's short enough that the
+auto-generated, so it can drift - but it's short enough that the
 drift is reviewable in any PR that adds/changes an endpoint.
 
 **What's in the document:**
@@ -60,14 +60,14 @@ drift is reviewable in any PR that adds/changes an endpoint.
 - Schemas for the major DTO types (DTO = "data transfer object," in
   plain terms: the shape of an object as it travels over the wire,
   like the standard form a recipe card takes when passed between
-  counters) — Creator, Video, Topic, Report, ImportJob, etc.
+  counters) - Creator, Video, Topic, Report, ImportJob, etc.
 - Recently-added surface worth knowing: `GET /api/reports` is paginated,
   `POST /api/reports/bulk-delete` deletes by id-set or all (admin),
   `POST /api/reports/reset-starter` restores the clean saved-report state
   (admin), report generation is async (202 + `QueuedRun { analysisRunId }`),
   and the `Dashboard` schema includes the nullable `featuredInsight` hero.
 
-**Served at:** `/api/openapi.json` — the `app.ts` mounts this at that
+**Served at:** `/api/openapi.json` - the `app.ts` mounts this at that
 URL. Swagger UI can be pointed at it for interactive exploration.
 
 **Used by:** anyone reading the API spec (humans or tools). The
@@ -80,13 +80,13 @@ frontend doesn't read it at runtime; the frontend's type definitions
 
 ```
 app.ts
- │
- ├─ app.use("/api/openapi.json", (req, res) => res.json(openapiSpec))
- │
- ▼
+ |
+ +-- app.use("/api/openapi.json", (req, res) => res.json(openapiSpec))
+ |
+ v
 openapi/spec.ts
- │
- ▼
+ |
+ v
 A static OpenAPI 3.0 JSON document at request time
 ```
 

@@ -1,9 +1,9 @@
-# \_LEARN.md — `e2e/`
+# \_LEARN.md - `e2e/`
 
 > Five Playwright spec files (Playwright is a tool that drives a real
-> browser the way a person would — clicking, typing, scrolling). The view
-> from a real browser. Not jsdom — that's a fake, pretend-browser that
-> only lives in memory — but actual Chromium (the open-source guts of
+> browser the way a person would - clicking, typing, scrolling). The view
+> from a real browser. Not jsdom - that's a fake, pretend-browser that
+> only lives in memory - but actual Chromium (the open-source guts of
 > Chrome) driving real HTTP calls against the running stack.
 
 ---
@@ -44,12 +44,14 @@ the five highest-traffic flows in order:
 4. Open one evidence card detail, verify the chunk citation.
 5. Open reports or compare creators to verify the insight surfaces.
 
-**Why it exists:** if this spec breaks, the demo is broken. It's the
+**Why it exists:** if this spec breaks, the product walkthrough is broken. It's the
 "recruiter just opened the app on a Monday morning" test. Every
 push-to-deploy should pass this.
 
-**Prerequisites:** Postgres up + seed run + backend on :4000 + frontend
-on :5173 + `ENABLE_MOCK_MODE=true` (so no real LLM keys are needed).
+**Prerequisites:** the real database snapshot restored through
+`npm run setup:local`, backend on :4000, and frontend on :5173. CI uses
+real providers where feasible and route-level test interception for expensive
+report-generation branches, so no OpenAI key is needed.
 
 ---
 
@@ -61,18 +63,18 @@ sections (coverage stat cards, shared-topics table, stance-over-time
 overlay chart), and the cap at 5 creators.
 
 **Why it exists:** Compare is the most interaction-heavy page in the
-app — lots of state, lots of conditional rendering depending on
+app - lots of state, lots of conditional rendering depending on
 selection count. Component tests can't catch the "two creators
 selected but the chart axis labels overlap" kind of bug. This spec can.
 
-**Prerequisites:** at least 3 seeded creators with overlapping topics.
+**Prerequisites:** the restored real five-creator corpus.
 
 ---
 
 ### `a11y.spec.ts`
 
 **What it is:** runs **axe-core** (think of it as an automatic
-accessibility inspector — "a11y" is short for "accessibility," the practice
+accessibility inspector - "a11y" is short for "accessibility," the practice
 of making sites usable for people with disabilities; axe-core is the
 industry-standard rule engine) against every top-level routed page. For
 each route, the test:
@@ -84,8 +86,8 @@ each route, the test:
 
 **Why it exists:** a recruiter or hiring manager landing on any route
 should never see a screen-reader-broken or keyboard-unusable page. This
-spec encodes that promise. Adding a new top-level route Add it to the
-`PAGES_TO_AUDIT` list — one test per entry.
+spec encodes that promise. When adding a new top-level route, add it to the
+`PAGES_TO_AUDIT` list - one test per entry.
 
 **What it catches:** missing `alt` text, missing `aria-label` on icon
 buttons, color contrast failures, broken focus order, role mismatches.
@@ -108,7 +110,7 @@ blank image.
 
 **What it deliberately doesn't do:** pixel-diff regression (think of it
 as comparing today's screenshot to yesterday's screenshot pixel by pixel
-and failing if anything moved — even by one dot). Recharts + font hinting
+and failing if anything moved - even by one dot). Recharts + font hinting
 
 - browser version create sub-pixel diffs (tiny, invisible differences)
   across machines. We'd rather have reliable tests than chase those.
@@ -138,20 +140,21 @@ ML model classifying real transcript data. The screenshots document that
 achievement. The skip pattern means CI runners do not fail when the local
 real-data dump is absent.
 
-**Prerequisites:** trained-model seed (see `PERSONAL_MACHINE_SETUP.md`).
+**Prerequisites:** the restored real database snapshot (see
+`PERSONAL_MACHINE_SETUP.md`).
 
 ---
 
-## How specs are organized — by user flow, not by page
+## How specs are organized - by user flow, not by page
 
 Note that the spec names don't mirror page names (no `dashboard.spec.ts`,
 `creators.spec.ts`, etc.). Instead, they're named for **user flows**:
 
-- `golden-path` — the main demo
-- `compare` — the comparison flow
-- `a11y` — the accessibility audit (cross-cutting concern)
-- `visuals` — the screenshot capture (cross-cutting concern)
-- `trained-model-demo` — the trained-model showcase
+- `golden-path` - the main product walkthrough
+- `compare` - the comparison flow
+- `a11y` - the accessibility audit (cross-cutting concern)
+- `visuals` - the screenshot capture (cross-cutting concern)
+- `trained-model-demo` - the trained-model showcase
 
 This is intentional. E2E tests are slow (seconds per test); the value
 they add over unit tests is **exercising real user paths**, not
@@ -164,16 +167,13 @@ proving.
 ## How e2e/ connects to everything else
 
 ```
-[Postgres :5432] ◀─── prisma client ─── [backend :4000] ◀─── HTTP ─── [frontend :5173]
- ▲
- │
- Chromium driven by
- │
- ▼
- Playwright runner
- │
- ▼
- e2e/*.spec.ts
+[Postgres :5432] <-- prisma client --> [backend :4000] <-- HTTP --> [frontend :5173]
+     ^
+     |
+Chromium driven by Playwright runner
+     |
+     v
+e2e/*.spec.ts
 ```
 
 The whole stack has to be running for these to pass. The
@@ -187,7 +187,7 @@ servers automatically via `webServer.command`.
 | You want to fix...                                | Open...                                                                                           |
 | ------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
 | `golden-path.spec.ts` failing                     | Run the app locally, do the flow by hand, fix whatever's broken                                   |
-| A11y violation                                    | The test will name the rule (e.g. `color-contrast`) and the element — fix the component           |
+| A11y violation                                    | The test will name the rule (e.g. `color-contrast`) and the element; fix the component            |
 | New page needs a11y coverage                      | Add to `PAGES_TO_AUDIT` in `a11y.spec.ts`                                                         |
 | Want a new screenshot variant                     | Add it to `visuals.spec.ts`                                                                       |
 | Real-corpus screenshot spec skipping unexpectedly | Check that the real-data dump was restored and Huberman is visible on the dashboard               |

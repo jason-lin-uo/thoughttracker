@@ -1,7 +1,9 @@
 # ThoughtTracker
 
-Built by Jason Lin as a full-stack ML-backed portfolio project.
+Built by Jason Lin, Senior Full-Stack AI/ML Software Engineer, as a
+production-minded transcript intelligence portfolio project.
 
+[![CI](https://github.com/jason-lin-uo/thoughttracker/actions/workflows/ci.yml/badge.svg)](https://github.com/jason-lin-uo/thoughttracker/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)](https://react.dev/)
@@ -25,6 +27,18 @@ needs an OpenAI key to see rich reports. The companion `thoughttracker-ml` repo
 remains the offline pipeline for adding creators, recalibrating labels, and
 refreshing the product snapshot.
 
+## 30-Second Tour
+
+1. Open the [live app](https://thoughttracker-web-415a.onrender.com/) and start
+   on the dashboard.
+2. Open a report and inspect the clickable transcript evidence behind the
+   written analysis.
+3. Open Topic Analysis to see stance trajectory, evidence quotes, and source
+   links for a real creator/topic pair.
+4. Skim the screenshots below, then review [`ARCHITECTURE.md`](ARCHITECTURE.md)
+   for the system design.
+5. Run locally with `npm run setup:local` and `npm run dev`.
+
 ## Project Preview
 
 The hosted app is the best way to explore the product, but these screenshots
@@ -41,6 +55,53 @@ clickable stance trajectory.
 trajectory visualization, and source evidence.
 
 ![ThoughtTracker topic analysis page with creator-specific stance trends and transcript evidence.](docs/assets/screenshots/topic-analysis.png)
+
+## What This Demonstrates
+
+- Senior full-stack product architecture across React, TypeScript, Express,
+  Prisma, PostgreSQL, and Render/Neon deployment.
+- AI product design that keeps claims evidence-backed, source-linked, and
+  limited to transcript text instead of pretending to know private beliefs.
+- Practical ML integration through the sibling `thoughttracker-ml` FastAPI
+  pipeline for stance, topic relevance, reranking, embeddings, and final policy
+  calibration.
+- Cost-aware local AI through Ollama, so rich report generation works without
+  handing reviewers an OpenAI key or creating token-billing risk.
+- Production discipline: Git LFS artifacts, real database snapshots, CI,
+  Playwright, accessibility checks, 100% unit-test line coverage, and a
+  one-command local setup path.
+
+## Tech And Concepts
+
+**Stack:** React, TypeScript, Vite, Express, Node.js, Prisma, PostgreSQL,
+pgvector, TanStack Query, Recharts, Tailwind, Ollama, Playwright, Vitest,
+Docker, Render, Neon, Git LFS.
+
+**Engineering:** system design, CI/CD, asynchronous jobs, API design, OpenAPI,
+rate limiting, request timeouts, idempotency, public read caching,
+owner-gated workflows, database snapshots, cross-platform local setup,
+accessibility testing, source traceability, and cross-repo integration.
+
+**AI/ML:** NLP, LLM integration, prompt engineering, evidence-grounded report
+generation, RAG-style grounding, embeddings, vector storage, model serving,
+stance classification, topic relevance, topic reranking, calibration, precision,
+recall, F1, and local AI.
+
+## Future Enhancements And Upcoming Features
+
+- Durable background processing with Redis + BullMQ for multi-user production
+  workloads, retries, job persistence, and dead-letter queues.
+- MCP server integration so AI tools can query transcript evidence, topic
+  timelines, and report-generation workflows through a standardized context
+  interface.
+- RAG-style evidence retrieval over transcript chunks if semantic search is
+  reintroduced with stronger relevance controls and clearer UX boundaries.
+- Active learning loop for new creators: review uncertain rows, append
+  validated labels, and retrain only when metrics justify the added complexity.
+- Production observability with structured metrics, queue dashboards, model
+  drift monitoring, and richer deploy/runtime health checks.
+- Generated API/client types from OpenAPI so backend and frontend contracts stay
+  synchronized as the product grows.
 
 ## What To Review First
 
@@ -66,6 +127,19 @@ trajectory visualization, and source evidence.
 - No silent fake runtime: local/hosted provider failures surface clearly instead
   of saving fabricated reports or vectors.
 
+## Core Features
+
+- Dashboard with creator, topic, report, evidence, and trend summaries.
+- Creator pages with top topics, recent videos, report access, and topic links.
+- Compare page with shared-topic navigation between creators.
+- Topic Analysis page with stance trajectory, frequency charts, episode
+  summaries, evidence quotes, and source links.
+- Evidence explorer with transcript context around each quoted chunk.
+- Page-level search and filtering for creators, videos, topics, and evidence.
+- Rich local report generation through Ollama by default.
+- Owner-only Add Creators workflow for future transcript ingestion and
+  reanalysis.
+
 ## Current Baseline
 
 The current snapshot uses five creators, the final transcript corpus, and the
@@ -82,19 +156,6 @@ gold-standard topic-selection policy produced in `thoughttracker-ml`.
 Macro F1 is the honest rare-topic polish metric. The product-quality baseline is
 strong on exact match, micro F1, precision, recall, evidence quality, and
 conservative display gating.
-
-## Core Features
-
-- Dashboard with creator, topic, report, evidence, and trend summaries.
-- Creator pages with top topics, recent videos, report access, and topic links.
-- Compare page with shared-topic navigation between creators.
-- Topic Analysis page with stance trajectory, frequency charts, episode
-  summaries, evidence quotes, and source links.
-- Evidence explorer with transcript context around each quoted chunk.
-- Page-level search and filtering for creators, videos, topics, and evidence.
-- Rich local report generation through Ollama by default.
-- Owner-only Add Creators workflow for future transcript ingestion and
-  reanalysis.
 
 ## Architecture At A Glance
 
@@ -347,10 +408,10 @@ control.
 Current local verification:
 
 - Backend typecheck: passing.
-- Backend Vitest: 721 tests passing.
+- Backend Vitest: 726 tests passing.
 - Frontend typecheck: passing.
-- Frontend Vitest: 328 tests passing.
-- ML pytest: 183 tests passing with 100% coverage.
+- Frontend Vitest: 332 tests passing.
+- ML pytest: 192 tests passing with 100% coverage.
 
 Playwright should be run after the local database, backend, frontend, and
 Ollama are up. ML service startup is only needed for owner reanalysis flows.
